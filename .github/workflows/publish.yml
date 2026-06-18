@@ -1,0 +1,24 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  packagist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+      - run: composer validate --strict
+      - run: php test/syntax.php
+      - name: Notify Packagist
+        run: |
+          curl -fsS -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repository\":{\"url\":\"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}\"}}" \
+            "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}"
+        env:
+          PACKAGIST_USERNAME: ${{ secrets.PACKAGIST_USERNAME }}
+          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
