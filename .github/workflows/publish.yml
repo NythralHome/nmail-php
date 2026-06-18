@@ -2,6 +2,11 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm_publish:
+        description: Type publish-nmail-php to notify Packagist
+        required: true
+        default: dry-run
 
 jobs:
   packagist:
@@ -12,8 +17,12 @@ jobs:
         with:
           php-version: "8.2"
       - run: composer validate --strict
+      - run: php -l src/NmailClient.php
+      - run: php -l src/NmailException.php
+      - run: php -l src/NmailValidationException.php
       - run: php test/syntax.php
       - name: Notify Packagist
+        if: ${{ inputs.confirm_publish == 'publish-nmail-php' }}
         run: |
           curl -fsS -X POST \
             -H "Content-Type: application/json" \

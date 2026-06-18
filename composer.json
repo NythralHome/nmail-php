@@ -3,6 +3,11 @@
   "description": "Official Nmail transactional email client for PHP and Laravel server code.",
   "type": "library",
   "license": "proprietary",
+  "homepage": "https://nmail.nythral.com",
+  "support": {
+    "source": "https://github.com/NythralHome/nmail-php",
+    "issues": "https://github.com/NythralHome/nmail-php/issues"
+  },
   "autoload": {
     "psr-4": {
       "Nythral\\Nmail\\": "src/"
