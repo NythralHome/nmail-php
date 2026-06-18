@@ -35,3 +35,13 @@ $nmail->sendEmail([
 ## Errors
 
 Failed requests throw `NmailException` with `status`, `errorCode`, and optional `details`.
+
+## TLS certificates
+
+If PHP cannot open HTTPS URLs because `openssl.cafile` points to a missing file, configure PHP with the system CA bundle:
+
+```bash
+php -d openssl.cafile=/etc/ssl/certs/ca-certificates.crt your-script.php
+```
+
+On production hosts, fix this in `php.ini` instead of passing it per command.
