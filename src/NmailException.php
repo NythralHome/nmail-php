@@ -14,4 +14,9 @@ final class NmailException extends \RuntimeException
     ) {
         parent::__construct($message, $status);
     }
+
+    public function retryable(): bool
+    {
+        return in_array($this->status, [502, 503, 504], true);
+    }
 }

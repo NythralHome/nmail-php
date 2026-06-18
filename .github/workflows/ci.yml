@@ -16,4 +16,5 @@ jobs:
       - run: composer validate --strict
       - run: php -l src/NmailClient.php
       - run: php -l src/NmailException.php
+      - run: php -l src/NmailValidationException.php
       - run: php test/syntax.php
