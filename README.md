@@ -4,7 +4,7 @@ Server-side PHP client for the Nmail transactional email API.
 
 Keep `NMAIL_API_KEY` in server environment variables. Do not expose the key to browser JavaScript.
 
-The `from` address must be an active mailbox created in Nmail for your account. Nmail does not allow arbitrary `anything@yourdomain.com` sender addresses, even when the domain is verified in SES.
+The `from` address must be an active Nmail address created for your account. It can be a receiving inbox or a sender-only address. Nmail does not allow arbitrary `anything@yourdomain.com` sender addresses, even when the domain is verified in SES.
 
 ## Install
 
