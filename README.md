@@ -6,6 +6,16 @@ Keep `NMAIL_API_KEY` in server environment variables. Do not expose the key to b
 
 The `from` address must be an active Nmail address created for your account. It can be a receiving inbox or a sender-only address. Nmail does not allow arbitrary `anything@yourdomain.com` sender addresses, even when the domain is verified in SES.
 
+## Create an API key
+
+1. Open `https://nmail.nythral.com/manage/#api`.
+2. Sign in with the Nythral account that owns the sender address.
+3. Make sure the sender address or sender-only mailbox you want to use is active.
+4. Create an API key, give it a clear name such as `production-app`, and copy the secret once.
+5. Store it as `NMAIL_API_KEY` in your server environment.
+
+API keys are server-side secrets. Do not commit them, send them to browsers, store them in mobile apps, or paste them into public issue trackers. Rotate the key from the dashboard if it is exposed.
+
 ## Install
 
 ```bash

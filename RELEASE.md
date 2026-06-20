@@ -14,8 +14,19 @@ Use this checklist before running the `Publish` workflow.
 ## Packagist
 
 - Package name: `nythral/nmail`.
+- Repository visibility must be public before submitting to public Packagist.
 - Required GitHub secrets: `PACKAGIST_USERNAME`, `PACKAGIST_TOKEN`.
-- Publish workflow input `confirm_publish` must be exactly `publish-nmail-php`.
+- `PACKAGIST_TOKEN` must be a Packagist **Main API Token** for the first package creation. A Safe API Token is enough for later package updates.
+- First release: run the `Publish` workflow with `packagist_action=create` and `confirm_publish=publish-nmail-php`.
+- Later releases: run the `Publish` workflow with `packagist_action=update` and `confirm_publish=publish-nmail-php`.
+- Alternative first release: submit `https://github.com/NythralHome/nmail-php` in the Packagist UI, then use the workflow for updates.
+
+## Creating Packagist credentials
+
+1. Sign in to `https://packagist.org`.
+2. Open your profile settings and create a **Main API Token** named `nmail-publish`.
+3. Add `PACKAGIST_USERNAME` and `PACKAGIST_TOKEN` to the GitHub repository secrets for `NythralHome/nmail-php`.
+4. Do not paste the token into chat, commits, issue comments, or workflow logs.
 
 ## Post-Release
 

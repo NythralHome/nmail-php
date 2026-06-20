@@ -3,6 +3,14 @@ name: Publish
 on:
   workflow_dispatch:
     inputs:
+      packagist_action:
+        description: Create the package on first release, update it later
+        type: choice
+        required: true
+        default: update
+        options:
+          - create
+          - update
       confirm_publish:
         description: Type publish-nmail-php to notify Packagist
         required: true
@@ -21,8 +29,18 @@ jobs:
       - run: php -l src/NmailException.php
       - run: php -l src/NmailValidationException.php
       - run: php test/syntax.php
-      - name: Notify Packagist
-        if: ${{ inputs.confirm_publish == 'publish-nmail-php' }}
+      - name: Create Packagist package
+        if: ${{ inputs.confirm_publish == 'publish-nmail-php' && inputs.packagist_action == 'create' }}
+        run: |
+          curl -fsS -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repository\":{\"url\":\"${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}\"}}" \
+            "https://packagist.org/api/create-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}"
+        env:
+          PACKAGIST_USERNAME: ${{ secrets.PACKAGIST_USERNAME }}
+          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+      - name: Update Packagist package
+        if: ${{ inputs.confirm_publish == 'publish-nmail-php' && inputs.packagist_action == 'update' }}
         run: |
           curl -fsS -X POST \
             -H "Content-Type: application/json" \
