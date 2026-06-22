@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 - 2026-06-22
+
+- Added `cc`, `bcc`, `stream`, and `idempotencyKey` send options.
+- Added attachment payload support with base64 content.
+- Added invoice-style SDK smoke coverage.
+
 ## 0.1.0 - 2026-06-18
 
 - Initial PHP/Laravel SDK for Nmail transactional email.

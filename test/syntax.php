@@ -58,6 +58,45 @@ if ($retryResult['id'] !== 'msg_2' || $retryCalls !== 2) {
     throw new RuntimeException('Nmail PHP SDK retry test failed');
 }
 
+$invoiceCalls = 0;
+$invoiceClient = new NmailClient('nmail_live_test', options: [
+    'transport' => function (string $url, array $options) use (&$invoiceCalls): array {
+        $invoiceCalls++;
+        $body = json_decode((string)($options['http']['content'] ?? '{}'), true, flags: JSON_THROW_ON_ERROR);
+        if (
+            $url !== 'https://nmail.nythral.com/api/nmail/v1/send'
+            || ($body['cc'][0] ?? '') !== 'owner@example.com'
+            || ($body['bcc'][0] ?? '') !== 'audit@example.com'
+            || ($body['stream'] ?? '') !== 'billing'
+            || ($body['idempotencyKey'] ?? '') !== 'invoice:INV-001'
+            || ($body['attachments'][0]['filename'] ?? '') !== 'INV-001.pdf'
+        ) {
+            throw new RuntimeException('Unexpected invoice SDK request');
+        }
+
+        return ['status' => 202, 'body' => '{"id":"msg_invoice","status":"queued"}'];
+    },
+]);
+$invoiceClient->sendEmail([
+    'from' => 'invoices@example.com',
+    'to' => ['billing@example.com'],
+    'cc' => ['owner@example.com'],
+    'bcc' => ['audit@example.com'],
+    'subject' => 'Invoice INV-001',
+    'text' => 'Invoice attached.',
+    'stream' => 'billing',
+    'idempotencyKey' => 'invoice:INV-001',
+    'attachments' => [[
+        'filename' => 'INV-001.pdf',
+        'contentType' => 'application/pdf',
+        'contentBase64' => 'JVBERi0xLjQK',
+    ]],
+]);
+
+if ($invoiceCalls !== 1) {
+    throw new RuntimeException('Nmail PHP SDK invoice test failed');
+}
+
 try {
     $client->sendEmail([
         'from' => 'app@example.com',

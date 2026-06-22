@@ -90,6 +90,26 @@ $nmail->sendEmail([
 ]);
 ```
 
+## Invoice with PDF attachment
+
+```php
+$nmail->sendEmail([
+    'from' => 'invoices@yourdomain.com',
+    'to' => ['billing@example.com'],
+    'cc' => ['owner@example.com'],
+    'subject' => "Invoice {$invoice->number}",
+    'text' => 'Please find your invoice attached.',
+    'html' => '<p>Please find your invoice attached.</p>',
+    'stream' => 'billing',
+    'idempotencyKey' => "invoice:{$invoice->id}",
+    'attachments' => [[
+        'filename' => "{$invoice->number}.pdf",
+        'contentType' => 'application/pdf',
+        'contentBase64' => base64_encode($pdfBytes),
+    ]],
+]);
+```
+
 ## Errors
 
 Validation failures throw `NmailValidationException` before any network request.

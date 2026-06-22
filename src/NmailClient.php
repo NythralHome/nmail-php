@@ -37,10 +37,15 @@ final class NmailClient
      * @param array{
      *   from: string,
      *   to: string|array<int,string>,
+     *   cc?: string|array<int,string>,
+     *   bcc?: string|array<int,string>,
      *   subject: string,
      *   text?: string,
      *   html?: string,
-     *   replyTo?: string
+     *   replyTo?: string,
+     *   stream?: string,
+     *   idempotencyKey?: string,
+     *   attachments?: array<int,array{filename:string,contentType?:string,contentBase64:string,disposition?:string}>
      * } $message
      * @return array<string,mixed>
      */
@@ -141,9 +146,11 @@ final class NmailClient
     private function validateMessage(array $message): void
     {
         $this->assertEmail($message['from'] ?? null, 'from');
-        $to = $message['to'] ?? null;
-        $recipients = is_array($to) ? $to : [$to];
-        if ($recipients === [] || array_filter($recipients, fn (mixed $email): bool => !$this->validEmail($email)) !== []) {
+        $to = $this->emailList($message['to'] ?? null);
+        $cc = $this->emailList($message['cc'] ?? []);
+        $bcc = $this->emailList($message['bcc'] ?? []);
+        $recipients = array_values(array_unique([...$to, ...$cc, ...$bcc]));
+        if ($to === [] || array_filter($recipients, fn (mixed $email): bool => !$this->validEmail($email)) !== []) {
             throw new NmailValidationException('Use one or more valid recipient email addresses', 'to');
         }
         if (!is_string($message['subject'] ?? null) || trim((string)$message['subject']) === '') {
@@ -154,6 +161,45 @@ final class NmailClient
         }
         if (array_key_exists('replyTo', $message)) {
             $this->assertEmail($message['replyTo'], 'replyTo');
+        }
+        if (array_key_exists('attachments', $message)) {
+            $this->validateAttachments($message['attachments']);
+        }
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function emailList(mixed $value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+        $items = is_array($value) ? $value : [$value];
+        $emails = array_values(array_filter(array_map(
+            fn (mixed $email): string => trim((string)$email),
+            $items,
+        )));
+        return array_values(array_unique($emails));
+    }
+
+    private function validateAttachments(mixed $attachments): void
+    {
+        if (!is_array($attachments)) {
+            throw new NmailValidationException('Attachments must be an array', 'attachments');
+        }
+        foreach ($attachments as $index => $attachment) {
+            if (!is_array($attachment)) {
+                throw new NmailValidationException('Attachment ' . ((int)$index + 1) . ' must be an array', 'attachments');
+            }
+            $filename = trim((string)($attachment['filename'] ?? $attachment['name'] ?? ''));
+            $contentBase64 = trim((string)($attachment['contentBase64'] ?? $attachment['content'] ?? ''));
+            if ($filename === '') {
+                throw new NmailValidationException('Attachment ' . ((int)$index + 1) . ' requires a filename', 'attachments');
+            }
+            if ($contentBase64 === '' || base64_decode($contentBase64, true) === false) {
+                throw new NmailValidationException("Attachment {$filename} requires valid contentBase64", 'attachments');
+            }
         }
     }
 
