@@ -18,8 +18,17 @@ API keys are server-side secrets. Do not commit them, send them to browsers, sto
 
 ## Install
 
+Install from the GitHub source repository with Composer:
+
 ```bash
-composer require nythral/nmail
+composer config repositories.nythral-nmail vcs https://github.com/NythralHome/nmail-php
+composer require nythral/nmail:dev-main
+```
+
+For a pinned production install, require a tagged release instead of `dev-main`:
+
+```bash
+composer require nythral/nmail:^0.2
 ```
 
 ## PHP
